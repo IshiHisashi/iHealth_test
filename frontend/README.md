@@ -1,6 +1,7 @@
 # Getting Started with Create React App
 
-$cd frontend
+Initially, please confuct
+"$cd frontend"
 $npm install
 $npm start
 
