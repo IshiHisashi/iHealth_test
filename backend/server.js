@@ -2,13 +2,12 @@ const express = require("express");
 const axios = require("axios");
 const qs = require("qs");
 const cors = require("cors");
+const cron = require("node-cron");
 
 require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 5001;
-
-console.log(port);
 
 app.use(cors());
 app.use(express.json());
@@ -91,6 +90,71 @@ app.get("/api/blood-glucose", async (req, res) => {
   } catch (error) {
     console.error("Error fetching blood glucose data:", error);
     res.status(500).send("Error fetching data");
+  }
+});
+// Function to refresh access token
+const refreshAccessToken = async (refresh_token) => {
+  try {
+    const response = await axios.post(
+      "https://api.ihealthlabs.com:8443/OpenApiV2/OAuthv2/userauthorization/",
+      qs.stringify({
+        client_id,
+        client_secret,
+        grant_type: "refresh_token",
+        refresh_token,
+      }),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    const { AccessToken, RefreshToken } = response.data;
+    // Update tokens
+    accessTokenStore["user"] = { AccessToken, RefreshToken };
+    return AccessToken;
+  } catch (error) {
+    console.error("Error refreshing access token", error);
+    throw new Error("Failed to refresh access token");
+  }
+};
+
+// Scheduled task to automatically retrieve data every 1 hour
+cron.schedule("0 0 * * *", async () => {
+  console.log("Running scheduled task to fetch data from iHealth...");
+
+  // Get stored tokens
+  let token = accessTokenStore["user"]?.AccessToken;
+  const refresh_token = accessTokenStore["user"]?.RefreshToken;
+
+  // Refresh the token if necessary
+  if (!token && refresh_token) {
+    token = await refreshAccessToken(refresh_token);
+  }
+
+  if (token) {
+    try {
+      // Fetch blood glucose data automatically
+      const response = await axios.get(
+        "https://api.ihealthlabs.com:8443/openapiv2/application/glucose.json",
+        {
+          params: {
+            client_id,
+            client_secret,
+            access_token: token,
+            sc,
+            sv,
+          },
+        }
+      );
+      console.log("Fetched glucose data:", response.data);
+
+      // Here you can store the data to your database for further processing
+    } catch (error) {
+      console.error(
+        "Error fetching blood glucose data in scheduled task:",
+        error
+      );
+    }
+  } else {
+    console.log("No valid token available");
   }
 });
 
