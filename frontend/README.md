@@ -1,16 +1,20 @@
 # Getting Started with Create React App
 
-Initially, please confuct
+## how to test
+Initially, please conduct 
+### frontend
 "$cd frontend"
 $npm install
 $npm start
 
+### backend
 $cd backend
 $npm install
 $npm run dev
 
 place .env below backend directory (sent separately)
 
+## Test image
 =>then, tap the 'Connect iHealth'
 <img width="745" alt="image" src="https://github.com/user-attachments/assets/70195e02-ef2f-411e-8baa-f844aee89e6e">
 
