@@ -3,13 +3,13 @@
 ## how to test
 Initially, please conduct 
 ### frontend
-"$cd frontend"
-$npm install
+$cd frontend,
+$npm install,
 $npm start
 
 ### backend
-$cd backend
-$npm install
+$cd backend,
+$npm install,
 $npm run dev
 
 place .env below backend directory (sent separately)
