@@ -6,13 +6,14 @@ function App() {
   const [error, setError] = useState("");
   // Start the OAuth2 flow by redirecting to the backend
   const handleConnectIHealth = () => {
-    window.location.href = "http://localhost:5000/auth/ihealth"; // Redirect to backend for iHealth login
+    window.location.href =
+      "http://localhost:5000/auth/ihealth?id=670202f50b3e86123bd741e4"; // Redirect to backend for iHealth login
   };
   // Fetch blood glucose data from the backend
   const fetchGlucoseData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/blood-glucose"
+        "http://localhost:5000/api/blood-glucose?id=670202f50b3e86123bd741e4"
       );
       setGlucoseData(response.data);
     } catch (err) {

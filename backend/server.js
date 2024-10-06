@@ -53,6 +53,8 @@ app.get("/auth/callback", async (req, res) => {
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
+    console.log(response.data);
+
     const { AccessToken, RefreshToken } = response.data;
 
     // Store tokens (in-memory or database)
@@ -75,17 +77,20 @@ app.get("/api/blood-glucose", async (req, res) => {
 
   try {
     const response = await axios.get(
-      "https://api.ihealthlabs.com:8443/openapiv2/application/glucose.json",
+      // "https://api.ihealthlabs.com:8443/openapiv2/application/glucose.json",
+      "https://api.ihealthlabs.com:8443/openapiv2/user/d7a4dc867a5e49fba3273496a939b6de/glucose.json",
       {
         params: {
           client_id,
           client_secret,
-          access_token: token,
+          access_token:
+            "2zWzds6MoVqu6PxuO8i89h9ypWZsbGt-mh54gddiijmyR900cQGVfY634bndN9Tp7Uq1Tefr7GAVLHzDhYrw2KK31qvDw8saMy8RSZRMHqD7kqcer7HsbcI9T-ZFOkLqD8nItc12E8zXGM0kFJ9s21RHcGyD56qbnrVmLyQTuiaSMgzeWc3Hejwt4V0wnTW9h6H0twEFqv*3SF7*Adj3Jg",
           sc,
           sv,
         },
       }
     );
+    // console.log(response.data);
     res.json(response.data);
   } catch (error) {
     console.error("Error fetching blood glucose data:", error);
@@ -116,8 +121,8 @@ const refreshAccessToken = async (refresh_token) => {
   }
 };
 
-// Scheduled task to automatically retrieve data every 1 hour
-cron.schedule("0 0 * * *", async () => {
+// Scheduled task
+cron.schedule("1 * * * *", async () => {
   console.log("Running scheduled task to fetch data from iHealth...");
 
   // Get stored tokens
@@ -145,8 +150,6 @@ cron.schedule("0 0 * * *", async () => {
         }
       );
       console.log("Fetched glucose data:", response.data);
-
-      // Here you can store the data to your database for further processing
     } catch (error) {
       console.error(
         "Error fetching blood glucose data in scheduled task:",
